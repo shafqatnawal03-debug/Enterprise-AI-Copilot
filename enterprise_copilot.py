@@ -43,9 +43,17 @@ with st.sidebar:
     st.write("Configure your AI Copilot here.")
     
     # API Key Configuration
-    api_key_input = st.text_input("🔑 Gemini API Key", type="password", help="Required to connect to Google's AI.")
-    if not api_key_input:
-        st.warning("Please enter your API key to start chatting.")
+    # First, try to read the key from Streamlit Cloud Secrets (so users don't need to enter it)
+    # If no secret exists (e.g. running locally), fall back to a manual text input box
+    secret_key = st.secrets.get("GEMINI_API_KEY", "") if hasattr(st, 'secrets') else ""
+    
+    if secret_key:
+        api_key_input = secret_key
+        st.success("✅ API Key loaded automatically!")
+    else:
+        api_key_input = st.text_input("🔑 Gemini API Key", type="password", help="Required to connect to Google's AI.")
+        if not api_key_input:
+            st.warning("Please enter your API key to start chatting.")
     
     st.divider()
     
